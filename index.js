@@ -19,12 +19,13 @@ const userRequest = () => {
             message: "What would you like to do? ",
             choices: [
                 "View all Departments",
+                "View all Employees",
+                "View All Roles",
                 "Add a Department",
                 "Add an Employee",
                 "Add a Role",
                 "Update Employee's Role",
-                "View all Employees",
-                "View All Roles"
+                "Update Enmployee's Manager"
                 ],
             },
         ]
@@ -49,8 +50,10 @@ let choiceHandler = (userSelect) => {
         newDept();
     } else if (userSelect.request == "View all Employees") {
         viewEmployees();
-    } else {
+    } else if (userSelect.request == "View all Roles") {
         viewRoles();
+    } else {
+        updateManager();
     };
 };
 
@@ -77,6 +80,7 @@ let viewEmployees = () => {
         role.title,
         department.department_name AS department,
         role.salary,
+        employee.manager_id,
         CONCAT(manager.first_name, ' ', manager.last_name) AS manager
         FROM employee
         LEFT JOIN role 
@@ -216,7 +220,7 @@ let newDept = () => {
                 message: "What is the id number of the new role for this employee?",
             }
          ]).then( (res) => {
-             console.log("Updating the employee role")
+             console.log("Updating the employee's role")
             connection.query(`SELECT id FROM employee WHERE id=${res.old_id}`);
             connection.query(`UPDATE employee SET ? WHERE role_id=${res.old_id}`,
             {
@@ -226,3 +230,26 @@ let newDept = () => {
             userRequest();
          });
      };
+
+     let updateManager = () => {
+        const findEmployee = inquirer.prompt([
+           {
+               type: "input",
+               name: "id",
+               message: "What is the id number of the employee you'd like to update?",
+           },
+           {
+               type: "input",
+               name: "manager",
+               message: "What is the id number of their new manager?",
+           }
+        ]).then( (res) => {
+            console.log("Updating the employee manager")
+           connection.query(`SELECT id FROM employee WHERE id=${res.id}`);
+           connection.query(`UPDATE employee SET ? WHERE manager_id=${res.manager}`,
+           {
+               manager_id: res.manager,
+           });
+           userRequest();
+        });
+    };
