@@ -44,7 +44,7 @@ let choiceHandler = (userSelect) => {
     } else if (userSelect.request == "Add a Role") {
         newRole();
     } else if (userSelect.request == "Update Employee's Role") {
-        console.log("you are updating an employee's role")
+        updateRole();
     } else if (userSelect.request == "Add a Department") {
         newDept();
     } else if (userSelect.request == "View all Employees") {
@@ -129,48 +129,100 @@ let newDept = () => {
             {
                 department_name: res.name
             });
+            viewDepartments();
             userRequest();
         });
-    }
+    };
 
-let newEmploy = async () => {  
 
-  const employee = await inquirer.prompt([
-      {
-        type: "input",
-         name: "name",
-        message: "What is the name of the employee you'd like to add?",
-            validate: (name) =>{
-                if (name) {
-                 return true;
-                } else {
-                 console.log(" Please Enter an Employee!")
-                return false;
-              }
-             },
-            },
-        ]);
-          
-           userRequest();
-          }
-
-let newRole = async () => {  
-
-        const role = await inquirer.prompt([
+    let newRole = () => {  
+        const role = inquirer.prompt([
               {
-            type: "input",
-             name: "name",
-             message: "What is the name of the role you'd like to add?",
-                validate: (name) =>{
-                  if (name) {
-                    return true;
-                 } else {
-                   console.log(" Please Enter a Role!")
-                  return false;
-                 }
+                type: "input",
+                name: "title",
+                message: "What is the name of the role you'd like to add?",
                 },
-             },
-         ]);
-          
-           userRequest();
-          };
+                {
+                    type: "input",
+                    name: "salary",
+                    message: "What is the salary for this role?",
+                },
+                {
+                    type: "input",
+                    name: "department",
+                    message: "What is the id of the department you'd like to add?",
+                }
+        ]).then((res) => {
+                console.log("Adding a new role")
+               
+                connection.query( 'INSERT INTO role SET ?',
+                {
+                    title: res.title,
+                    salary: res.salary,
+                    department_id: res.department
+                });
+            viewRoles();
+            userRequest();
+            });
+        }
+
+    let newEmploy = () => {  
+        const employee = inquirer.prompt([
+              {
+                  type: "input",
+                  name: "first_name",
+                    message: "What is their first name?",
+                },
+                {
+                    type: "input",
+                    name: "last_name",
+                   message: "What is their first name?",
+                 },
+                 {
+                     type: "input",
+                    name: "role",
+                     message: "What is their role id?",
+                },
+                {
+                    type: "input",
+                   name: "manager",
+                    message: "What is the id of their manager?",
+               }
+         ]).then((res) => {
+                 console.log("Adding a new role")
+                   
+                 connection.query( 'INSERT INTO employee SET ?',
+                 {
+                    first_name: res.first_name,
+                    last_name: res.last_name,
+                    role_id: res.role,
+                    manager_id: res.manager,
+                 });
+            viewEmployees();
+            userRequest();
+             });
+        }
+
+     let updateRole = () => {
+         const findEmployee = inquirer.prompt([
+            {
+                type: "input",
+                name: "old_id",
+                message: "What is the id number of the employee you'd like to update?",
+            },
+            {
+                type: "input",
+                name: "new_role",
+                message: "What is the id number of the new role for this employee?",
+            }
+         ]).then( (res) => {
+             console.log("Updating the employee role")
+            connection.query(`SELECT id FROM employee WHERE id=${res.old_id}`);
+            connection.query(`UPDATE employee SET ? WHERE role_id=${res.old_id}`,
+            {
+                role_id: res.new_role,
+            });
+            viewEmployees();
+            userRequest();
+         });
+     };
