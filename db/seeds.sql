@@ -1,7 +1,7 @@
 INSERT INTO department (department_name)
 VALUES ("Sales"),
        ("Accounting"),
-       ("Project Management"),
+       ("Project Management");
 
 INSERT INTO role (title, salary, department_id)
 VALUES ("Sales Manager", 75000, 1),
@@ -12,7 +12,7 @@ VALUES ("Sales Manager", 75000, 1),
        ("Accounting Representative", 75000, 2),
        ("Project Manager", 150000, 3),
        ("Project Lead", 85000, 3),
-       ("Project Representative", 75000, 3),
+       ("Project Representative", 75000, 3);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Liz", "DiTulio", 1, NULL),
@@ -22,4 +22,4 @@ VALUES ("Liz", "DiTulio", 1, NULL),
        ("Cinthia", "Geraldino", 5, 4),
        ("Allie", "Duca", 6, 4),
        ("Nick", "DiMAtteo", 7, NULL),
-       ("TJ", "Muniz", 8, 7),
+       ("TJ", "Muniz", 8, 7);
