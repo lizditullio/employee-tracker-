@@ -1,7 +1,6 @@
 const res = require('express/lib/response');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-//const connection = require('./db/connection');
 
 const connection = mysql.createConnection({
     host: '127.0.0.1',
@@ -20,12 +19,15 @@ const userRequest = () => {
             choices: [
                 "View all Departments",
                 "View all Employees",
-                "View All Roles",
+                "View all Roles",
                 "Add a Department",
                 "Add an Employee",
                 "Add a Role",
                 "Update Employee's Role",
-                "Update Enmployee's Manager"
+                "Update Employee's Manager",
+                "Delete an Employee",
+                "Delete a Department",
+                "Delete a Role"
                 ],
             },
         ]
@@ -40,20 +42,29 @@ const userRequest = () => {
 let choiceHandler = (userSelect) => {
     if (userSelect.request == "View all Departments") {
         viewDepartments();
+    } else if (userSelect.request == "View all Employees") {
+        viewEmployees();
+    } else if (userSelect.request == "View all Roles") {
+        viewRoles();
+    } else if (userSelect.request == "Add a Department") {
+        newDept();
     } else if (userSelect.request == "Add an Employee") {
        newEmploy();
     } else if (userSelect.request == "Add a Role") {
         newRole();
     } else if (userSelect.request == "Update Employee's Role") {
         updateRole();
-    } else if (userSelect.request == "Add a Department") {
-        newDept();
-    } else if (userSelect.request == "View all Employees") {
-        viewEmployees();
-    } else if (userSelect.request == "View all Roles") {
-        viewRoles();
-    } else {
+    } else if (userSelect.request == "Update Employee's Manager") {
         updateManager();
+    } else if (userSelect.request == "Delete an Employee"){ 
+        deleteEmployee();
+    } else if (userSelect.request == "Delete a Department"){ 
+        deleteDepartment();
+    } else if (userSelect.request == "Delete a Role"){ 
+        deleteRole();
+    } else {
+        console.log("Please select an option!")
+        userRequest();
     };
 };
 
@@ -180,7 +191,7 @@ let newDept = () => {
                 {
                     type: "input",
                     name: "last_name",
-                   message: "What is their first name?",
+                   message: "What is their last name?",
                  },
                  {
                      type: "input",
@@ -221,13 +232,10 @@ let newDept = () => {
             }
          ]).then( (res) => {
              console.log("Updating the employee's role")
-            connection.query(`SELECT id FROM employee WHERE id=${res.old_id}`);
-            connection.query(`UPDATE employee SET ? WHERE role_id=${res.old_id}`,
-            {
-                role_id: res.new_role,
-            });
+            connection.query(`UPDATE employee SET role_id=${res.new_role} WHERE id=${res.old_id}`);
             viewEmployees();
             userRequest();
+            //return this.connection;
          });
      };
 
@@ -245,11 +253,53 @@ let newDept = () => {
            }
         ]).then( (res) => {
             console.log("Updating the employee manager")
-           connection.query(`SELECT id FROM employee WHERE id=${res.id}`);
-           connection.query(`UPDATE employee SET ? WHERE manager_id=${res.manager}`,
-           {
-               manager_id: res.manager,
-           });
+           connection.query(`UPDATE employee SET manager_id=${res.manager} WHERE id=${res.id}`);
+           viewEmployees();
            userRequest();
+          // return this.connection;
+        });
+    };
+
+    let deleteEmployee = () => {
+        const findEmployee = inquirer.prompt([
+           {
+               type: "input",
+               name: "id",
+               message: "What is the id number of the employee you'd like to delete?",
+           }
+        ]).then( (res) => {
+            console.log("Deleting employee")
+           connection.query(`DELETE FROM employee WHERE id=${res.id}`);
+           userRequest();
+           return this.connection;
+        });
+    };
+
+    let deleteDepartment = () => {
+        const department = inquirer.prompt([
+           {
+               type: "input",
+               name: "id",
+               message: "What is the id number of the department you'd like to delete?",
+           }
+        ]).then( (res) => {
+            console.log("Deleting department")
+           connection.query(`DELETE FROM department WHERE id=${res.id}`);
+           userRequest();
+           return this.connection;
+        });
+    };
+
+    let deleteRole = () => {
+        const role = inquirer.prompt([
+           {
+               type: "input",
+               name: "id",
+               message: "What is the id number of the role you'd like to delete?",
+           }
+        ]).then( (res) => {
+           connection.query(`DELETE FROM role WHERE id=${res.id}`);
+           userRequest();
+           return this.connection;
         });
     };

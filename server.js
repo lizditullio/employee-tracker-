@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const connection = require('./db/connection');
+//const connection = require('./db/connection');
 const index = require('./index.js')
 
 // Tell node that we are creating an "express" server
